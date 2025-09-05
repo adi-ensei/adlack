@@ -3,7 +3,7 @@ import React from "react";
 
 const HomePage = () => {
   return (
-    <div>
+    <div className="bg-red-500">
       <UserButton />
       HomePage
     </div>
