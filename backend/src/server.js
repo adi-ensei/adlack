@@ -6,11 +6,13 @@ import { clerkMiddleware } from "@clerk/express";
 import { serve } from "inngest/express";
 import { functions, inngest } from "./config/inngest.js";
 import chatRoutes from "./routes/chat.routes.js";
+import cors from "cors";
 import * as Sentry from "@sentry/node";
 
 const app = express();
-app.use(express.json());
 
+app.use(express.json());
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(clerkMiddleware());
 
 app.get("/debug-sentry", function mainHandler(req, res) {
