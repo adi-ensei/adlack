@@ -34,7 +34,7 @@ const UsersList = ({ activeChannel }) => {
     queryKey: ["users-list", client?.user?.id],
     queryFn: fetchUsers,
     enabled: !!client?.user,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5, // 5 mins
   });
 
   const startDirectMessage = async (targetUser) => {

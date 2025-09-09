@@ -3,29 +3,31 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useStreamChat } from "../hooks/useStreamChat";
 import PageLoader from "../components/PageLoader";
-import "../styles/stream-chat-theme.css";
+
 import {
-  Channel,
   Chat,
-  Window,
+  Channel,
+  ChannelList,
   MessageList,
   MessageInput,
-  ChannelList,
+  Thread,
+  Window,
 } from "stream-chat-react";
-import { HashIcon, PlusIcon, UserIcon, UsersIcon } from "lucide-react";
 
+import "../styles/stream-chat-theme.css";
+import { HashIcon, PlusIcon, UsersIcon } from "lucide-react";
 import CreateChannelModal from "../components/CreateChannelModal";
 import CustomChannelPreview from "../components/CustomChannelPreview";
 import UsersList from "../components/UsersList";
 
 const HomePage = () => {
-  const [isCreatedModalOpen, setIsCreatedModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeChannel, setActiveChannel] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { isLoading, error, chatClient } = useStreamChat();
+  const { chatClient, error, isLoading } = useStreamChat();
 
-  // setting active channel
+  // set active channel from URL params
   useEffect(() => {
     if (chatClient) {
       const channelId = searchParams.get("channel");
@@ -36,17 +38,18 @@ const HomePage = () => {
     }
   }, [chatClient, searchParams]);
 
-  if (error) return <p>Something Went Wrong</p>;
+  // todo: handle this with a better component
+  if (error) return <p>Something went wrong...</p>;
   if (isLoading || !chatClient) return <PageLoader />;
 
   return (
     <div className="chat-wrapper">
       <Chat client={chatClient}>
         <div className="chat-container">
-          {/* Left Sidebar */}
+          {/* LEFT SIDEBAR */}
           <div className="str-chat__channel-list">
             <div className="team-channel-list">
-              {/* Header */}
+              {/* HEADER */}
               <div className="team-channel-list__header gap-4">
                 <div className="brand-container">
                   <img src="/logo.png" alt="Logo" className="brand-logo" />
@@ -56,18 +59,19 @@ const HomePage = () => {
                   <UserButton />
                 </div>
               </div>
-              {/* Channel List */}
-              <div className="team_channel-list__content">
+              {/* CHANNELS LIST */}
+              <div className="team-channel-list__content">
                 <div className="create-channel-section">
                   <button
-                    onClick={() => setIsCreatedModalOpen(true)}
+                    onClick={() => setIsCreateModalOpen(true)}
                     className="create-channel-btn"
                   >
                     <PlusIcon className="size-4" />
                     <span>Create Channel</span>
                   </button>
                 </div>
-                {/* Channel List */}
+
+                {/* CHANNEL LIST */}
                 <ChannelList
                   filters={{ members: { $in: [chatClient?.user?.id] } }}
                   options={{ state: true, watch: true }}
@@ -88,49 +92,53 @@ const HomePage = () => {
                           <span>Channels</span>
                         </div>
                       </div>
+
+                      {/* todos: add better components here instead of just a simple text  */}
                       {loading && (
-                        <div className="loading-message">Loading channels</div>
+                        <div className="loading-message">
+                          Loading channels...
+                        </div>
                       )}
                       {error && (
                         <div className="error-message">
                           Error loading channels
                         </div>
                       )}
+
                       <div className="channels-list">{children}</div>
+
                       <div className="section-header direct-messages">
                         <div className="section-title">
                           <UsersIcon className="size-4" />
                           <span>Direct Messages</span>
                         </div>
                       </div>
-                      <UsersList />
+                      <UsersList activeChannel={activeChannel} />
                     </div>
                   )}
                 />
               </div>
             </div>
           </div>
-          {/* Right Container */}
+
+          {/* RIGHT CONTAINER */}
           <div className="chat-main">
             <Channel channel={activeChannel}>
               <Window>
-                {/* <CustomChannelHeader/> */}
                 <MessageList />
                 <MessageInput />
               </Window>
+
+              <Thread />
             </Channel>
           </div>
         </div>
-        {isCreatedModalOpen && (
-          <CreateChannelModal
-            onClose={() => {
-              setIsCreatedModalOpen(false);
-            }}
-          />
+
+        {isCreateModalOpen && (
+          <CreateChannelModal onClose={() => setIsCreateModalOpen(false)} />
         )}
       </Chat>
     </div>
   );
 };
-
 export default HomePage;
