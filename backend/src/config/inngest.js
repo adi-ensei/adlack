@@ -27,6 +27,8 @@ const syncUser = inngest.createFunction(
       name: userName.name,
       image: newUser.image,
     });
+
+    await addUserToPublicChannel(newUser.clerkId.toString());
   }
 );
 
@@ -41,5 +43,4 @@ const deletedUserFromDB = inngest.createFunction(
   }
 );
 
-// Create an empty array where we'll export future Inngest functions
 export const functions = [syncUser, deletedUserFromDB];
